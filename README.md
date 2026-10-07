@@ -10,6 +10,7 @@ Tinson Dong: td584
 correctness.c:
 
 N    Scenario                        expected output                      exit
+
 1    free(&x), local variable        free: Inappropriate pointer(...)     2
 
 2    free(p+1)                       free: Inappropriate pointer(...)     2
