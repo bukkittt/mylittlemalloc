@@ -20,6 +20,8 @@ struct header {
 
 struct header *first_chunk = (struct header *)heap.bytes; // pointer to the first chunk in the heap
 
+// ^ is xtra storage and because its not static, client code can see it.
+
 static int initialized = 0; // flag to indicate if the heap has been initialized
 
 static void leak_detection() {
@@ -57,10 +59,15 @@ static void initialize_heap() {
 
 void * mymalloc (size_t size, char *file, int line){
     if(!initialized) initialize_heap();
-
     if (size == 0) return NULL;
+    
+    //fixed so we reject impossible sizes before rounding
+    if(size > MEMLENGTH - HEADERSIZE) { 
+	    fprintf(stderr, "malloc: Unable to allocate %zu bytes (%s:%d)\n", size, file, line);
+	    return NULL;
+    }
 
-    int alsize = (size + 7) & ~7;// size should be multiple of 8
+    int alsize = (int)((size + 7) & ~(size_t)7);// size should be multiple of 8
 
     int offset = 0;
     while(offset < MEMLENGTH){
@@ -72,7 +79,7 @@ void * mymalloc (size_t size, char *file, int line){
                 int temp_size = current_header-> size;
                 current_header-> size = alsize;
 
-                struct header *next_header= (struct header *) (current_header + HEADERSIZE + alsize);
+                struct header *next_header= (struct header *) ((char *)current_header + HEADERSIZE + alsize);
                 next_header-> size = temp_size - alsize - HEADERSIZE;
                 next_header-> allocated = 0;
             }
@@ -83,13 +90,13 @@ void * mymalloc (size_t size, char *file, int line){
         offset = offset + HEADERSIZE + current_header->size;
     }
 
-    fprintf(stderr, "malloc: Unable to allocate %zu bytes (%s: %d)\n", size, file, line);
+    fprintf(stderr, "malloc: Unable to allocate %zu bytes (%s:%d)\n", size, file, line);
     return NULL;
 }
 
 void myfree (void *ptr, char *file, int line){
     if (!initialized) initialize_heap();
-
+    if (ptr == NULL) return;
     //err1: address not obtained from malloc
     if ((char *)ptr < heap.bytes + HEADERSIZE || (char *)ptr >= heap.bytes + MEMLENGTH) {
         fprintf(stderr, "free: Inappropriate pointer (%s:%d)\n", file, line);
