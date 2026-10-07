@@ -132,7 +132,7 @@ void task5() {
 		char *bigger = malloc(size*2);
 		if (bigger == NULL) {failures++; break;}
 		for(i = 0; i < size; i++) bigger[i] = buf[i];
-		for(i = size; i<size*2; i++) bigger[i] = 'i';
+		for(i = size; i<size*2; i++) bigger[i] = 'x';
 		free(buf);
 		buf = bigger;
 		size *= 2;
