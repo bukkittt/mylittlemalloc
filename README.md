@@ -9,19 +9,19 @@ Tinson Dong: td584
 
 correctness.c:
 
-N    Scenario                        expected output                      exit
+N  |  Scenario                 |       expected output               |       exit
 
-1    free(&x), local variable        free: Inappropriate pointer(...)     2
+1  |  free(&x), local variable  |      free: Inappropriate pointer(...)   |  2
 
-2    free(p+1)                       free: Inappropriate pointer(...)     2
+2   | free(p+1)               |        free: Inappropriate pointer(...)    | 2
 
-3    double free                     free: Inappropriate pointer(...)     2
+3    |double free         |            free: Inappropriate pointer(...)   |  2
 
-4    free(&global_var)               free: Inappropriate pointer(...)     2
+4    |free(&global_var)    |           free: Inappropriate pointer(...)   |  2
 
-5    leak n objects              mymalloc: 128 bytes leaked in n objects  0
+5    |leak n objects      |        mymalloc: 128 bytes leaked in n objects | 0
 
-6    everything freed                N/A                                  0
+6    |everything freed      |          N/A                       |           0
 
 1. malloc() returns memory that does not overlap other objects.
    If objects overlapped, writing to one would change another.
